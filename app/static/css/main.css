@@ -1,0 +1,56 @@
+body {
+				background-color:#99CCFF;
+}
+#map {
+				height:500px;
+				width:700px;
+				margin: 0 auto;
+}
+
+h1 {
+				color : #C15844;
+				font-family: "Advent Pro";
+				font-feature-settings: "'liga' 1";
+				font-kerning: auto;
+				font-style: normal;
+				font-size: 4em;
+				font-weight: 400;
+				letter-spacing: 0;
+				line-height: 1.5em;
+				text-align: center;
+				text-decoration: none;
+				text-transform: none;
+				word-spacing: 0;
+}
+
+h3 {
+				font-size:2em;
+				line-height:0.8em;
+				text-align:center;
+}
+#map-canvas {
+				height:600px;
+				width:600px;
+				margin-left:auto;
+				margin-right:auto;
+				margin-top:0px;
+				margin-bottom:0px;
+				padding:0px;
+}
+
+#header {
+				text-align:center;
+}
+
+#nav {
+				margin:0 auto;
+				text-align:center;
+				width:500px;
+.section {
+				margin: 0 auto;
+				margin-top:20px;
+				margin-bottom:20px;
+				border-radius:25px;
+}
+
+

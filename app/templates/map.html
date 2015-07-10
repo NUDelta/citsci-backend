@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+ <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+ <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+<script>
+        $(document).ready(function(){
+          console.log("document is ready");
+          initialize();
+        });
+				var session_data;
+        var map;
+				var colors = ["#00CCFF",
+				              "#00FF33",
+											"#FF0000",
+											"#FFFF00",
+											"#0000FF",
+											"#FF00FF",
+											"#FF9900"]
+				function initialize() {
+								map = L.map('map').setView([{{ center_lat }},{{ center_lon }}], 8);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                    maxZoom: 18,
+                    id: '{{ mb_id }}',
+                    accessToken: '{{ token }}'
+                }).addTo(map);
+
+								$("#session_dropdown").change(function() {
+												console.log("change detected");
+												var str = "";
+												$( "#session_dropdown option:selected").each(function() {
+																str += $( this ).text();
+												});
+
+												$.get("/get_session/"+str, function( data ){
+																session_data = data;
+																var latitudes = [];
+																var longitudes = [];
+
+																var stage_to_colors = {};
+
+																for (var stage in session_data.locations){
+																	console.log("stage is " + stage);
+																	for (l in session_data.locations[stage]){
+																		//console.log(l);
+                                    var lat = session_data.locations[stage][l][0]
+                                    var lon = session_data.locations[stage][l][1]
+																		latitudes.push(lat)
+																		longitudes.push(lon)
+																		if (!(stage in stage_to_colors)){
+																			stage_to_colors[stage] = colors[Object.keys(stage_to_colors).length]
+																		}
+
+                                    var circle = L.circle([lat, lon], 1, {
+                                        color: stage_to_colors[stage],
+                                        fillColor: stage_to_colors[stage],
+                                        fillOpacity: 0.5
+                                    }).addTo(map);
+																	}
+																}
+
+																var sum_lat = 0;
+																var sum_lon = 0;
+																for (var i =0; i < latitudes.length; i++){
+																	sum_lat += latitudes[i];
+																	sum_lon += longitudes[i];
+																}
+																center_lat = sum_lat / latitudes.length;
+																center_lon = sum_lon / longitudes.length;
+
+                                var min_lat = Math.min.apply(null, latitudes);
+                                var max_lat = Math.max.apply(null, latitudes);
+                                var min_lon = Math.min.apply(null,longitudes);
+                                var max_lon = Math.max.apply(null, longitudes);
+                                console.log("min_lat==" + min_lat);
+                                console.log("max_lat==" + max_lat);
+                                console.log("min_lon==" + min_lon);
+                                console.log("max_lon==" + max_lon);
+                                var llBounds = L.latLngBounds(L.latLng(min_lat, min_lon),
+                                                              L.latLng(max_lat, max_lon));
+                                //map.panInsideBounds(llBounds, animate=true, padding=[0,0]);
+                                map.fitBounds(llBounds);
+												});
+								});
+
+				}
+
+
+</script>
+{% endblock %}
+{% block content %}
+<div id="header">
+				<h1>ZenWalk Maps</h1>
+</div>
+
+<div id="nav">
+				<h3>Choose a session</h3>
+				<select name="session_dropdown" id="session_dropdown">
+								{% for sesh in sessions %}
+								<option value={{ sesh }}>{{ sesh }}</option>
+								{% endfor %}
+				</select>
+</div>
+
+<div id="map"></div>
+{% endblock %}

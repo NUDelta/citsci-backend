@@ -10,6 +10,7 @@
         });
 				var session_data;
         var map;
+        var markers;
 				var colors = ["#00CCFF",
 				              "#00FF33",
 											"#FF0000",
@@ -19,6 +20,8 @@
 											"#FF9900"]
 				function initialize() {
 								map = L.map('map').setView([{{ center_lat }},{{ center_lon }}], 8);
+                console.log(markers);
+
                 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
                     maxZoom: 18,
@@ -27,6 +30,10 @@
                 }).addTo(map);
 
 								$("#session_dropdown").change(function() {
+                        if (map.hasLayer(markers)){
+                          map.removeLayer(markers);
+                        }
+                        markers = new L.FeatureGroup();
 												console.log("change detected");
 												var str = "";
 												$( "#session_dropdown option:selected").each(function() {
@@ -40,6 +47,8 @@
 
 																var stage_to_colors = {};
                                 var first_loc;
+
+
 																for (var stage in session_data.locations){
 																	console.log("stage is " + stage);
 																	for (l in session_data.locations[stage]){
@@ -58,19 +67,29 @@
 																			stage_to_colors[stage] = colors[Object.keys(stage_to_colors).length]
 																		}
 
-                                    var circle = L.circle([lat, lon], 1, {
+                                    /**var circle = L.circle([lat, lon], 1, {
                                         color: stage_to_colors[stage],
                                         fillColor: stage_to_colors[stage],
                                         fillOpacity: 0.5,
                                         riseOnHover: true,
                                         title: "Stage : " + stage
-                                    }).addTo(map).bindPopup("Stage : "+stage);
+                                    }).bindPopup("Stage : "+stage);
+                                    console.log(circle);**/
+                                    markers.addLayer(L.circle([lat, lon], 1, {
+                                        color: stage_to_colors[stage],
+                                        fillColor: stage_to_colors[stage],
+                                        fillOpacity: 0.5,
+                                        riseOnHover: true,
+                                        title: "Stage : " + stage
+                                    }).bindPopup("Stage : "+stage));
 																	}
 																}
                                 var last_loc = [lat, lon];
 
-                                L.marker(first_loc).addTo(map).bindPopup("Start").openPopup();
-                                L.marker(last_loc).addTo(map).bindPopup("End").openPopup();
+                                start_marker = L.marker(first_loc).bindPopup("Start").openPopup();
+                                end_marker = L.marker(last_loc).bindPopup("End").openPopup();
+                                markers.addLayer(start_marker);
+                                markers.addLayer(end_marker);
 
 																var sum_lat = 0;
 																var sum_lon = 0;
@@ -93,8 +112,7 @@
                                                               L.latLng(max_lat, max_lon));
                                 //map.panInsideBounds(llBounds, animate=true, padding=[0,0]);
                                 map.fitBounds(llBounds);
-
-
+                                map.addLayer(markers);
 												});
 								});
 

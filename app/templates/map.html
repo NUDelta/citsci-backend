@@ -39,13 +39,19 @@
 																var longitudes = [];
 
 																var stage_to_colors = {};
-
+                                var first_loc;
 																for (var stage in session_data.locations){
 																	console.log("stage is " + stage);
 																	for (l in session_data.locations[stage]){
+
+
 																		//console.log(l);
                                     var lat = session_data.locations[stage][l][0]
                                     var lon = session_data.locations[stage][l][1]
+
+                                    if (first_loc == undefined){
+                                      first_loc = [lat, lon];
+                                    }
 																		latitudes.push(lat)
 																		longitudes.push(lon)
 																		if (!(stage in stage_to_colors)){
@@ -55,10 +61,16 @@
                                     var circle = L.circle([lat, lon], 1, {
                                         color: stage_to_colors[stage],
                                         fillColor: stage_to_colors[stage],
-                                        fillOpacity: 0.5
-                                    }).addTo(map);
+                                        fillOpacity: 0.5,
+                                        riseOnHover: true,
+                                        title: "Stage : " + stage
+                                    }).addTo(map).bindPopup("Stage : "+stage);
 																	}
 																}
+                                var last_loc = [lat, lon];
+
+                                L.marker(first_loc).addTo(map).bindPopup("Start").openPopup();
+                                L.marker(last_loc).addTo(map).bindPopup("End").openPopup();
 
 																var sum_lat = 0;
 																var sum_lon = 0;
@@ -81,6 +93,8 @@
                                                               L.latLng(max_lat, max_lon));
                                 //map.panInsideBounds(llBounds, animate=true, padding=[0,0]);
                                 map.fitBounds(llBounds);
+
+
 												});
 								});
 

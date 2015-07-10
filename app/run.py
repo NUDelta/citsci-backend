@@ -1,5 +1,4 @@
 import psycopg2
-import folium
 import os
 import urlparse
 from flask import Flask, render_template, jsonify, send_from_directory, g, request

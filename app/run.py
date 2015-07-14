@@ -98,7 +98,26 @@ def send_css(path):
 
 @app.route('/get_session/<path:session>')
 def session_request(session):
-				return jsonify({"locations" : get_locations(session)})
+				return jsonify({"locations" : data.get_locations(session)})
+
+@app.route('/get_loop/<path:session>')
+def session_request(session):
+	# get session
+	session_locations = data.get_locations(session)
+	# get loop set
+	loop_set = data.checkForLoop(session_locations)
+	# make list of loop set objectIds
+	if loop_set != None:
+		loop_objIds = [l['objectId'] for l in loop_set]
+		for sl in session_locations:
+			if sl['objectId'] in loop_objIds:
+				sl['in_loop'] = True
+			else:
+				sl['in_loop'] = False
+		return jsonify({"type" : "loops", "locations" : session_locations})
+	else:
+		return jsonify({"error" : "No loops found", "locations" : session_locations})
+	# add an "in_loop" : True field for each location in loop set
 
 if __name__ == "__main__":
 				host_loc = "127.0.0.1"

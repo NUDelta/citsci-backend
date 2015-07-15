@@ -3,6 +3,7 @@ import os
 import urlparse
 from flask import Flask, render_template, jsonify, send_from_directory, g, request
 from time import time
+import data
 
 MAPBOX_TOKEN = "pk.eyJ1Ijoic2NvdHRvZnRoZXNjaSIsImEiOiJNZklwOUdNIn0.9cbLc1uMc3awc8_vWFMHsA"
 MAPBOX_SECRET = "sk.eyJ1Ijoic2NvdHRvZnRoZXNjaSIsImEiOiJPbElNT1owIn0.OmMclM1IhPSLzdXlZOQQ4Q"
@@ -11,8 +12,7 @@ MB_PROJECT_ID = "scottofthesci.mm6je637"
 '''Example taken from http://codepen.io/asommer70/blog/serving-a-static-directory-with-flask'''
 app = Flask(__name__)
 app.debug = True
-
-'''DATABASE setup'''
+'''
 def connect_to_database():
 				urlparse.uses_netloc.append("postgres")
 				url = urlparse.urlparse(os.environ["DATABASE_URL"])
@@ -72,11 +72,11 @@ def get_centerLatLon():
 				center_lon = cur.fetchone()[0]
 
 				return center_lat, center_lon
-
+'''
 @app.route('/')
 def send_index():
-				sessions = get_sessions()
-				center_lat, center_lon = get_centerLatLon()
+				sessions = data.get_sessions()
+				center_lat, center_lon = data.get_centerLatLon()
 				return render_template("map.html",
 															 sessions=sessions,
 															 center_lat=center_lat,
@@ -98,10 +98,15 @@ def send_css(path):
 
 @app.route('/get_session/<path:session>')
 def session_request(session):
-				return jsonify({"locations" : data.get_locations(session)})
+				session_locations = data.get_locations(session)
+				stages = list(set([s['stage'] for s in session_locations]))
+				locs_by_stage = {s : [] for s in stages}
+				for l in session_locations:
+					locs_by_stage[l['stage']].append(l)
+				return jsonify({"locations" : locs_by_stage})
 
 @app.route('/get_loop/<path:session>')
-def session_request(session):
+def loop_request(session):
 	# get session
 	session_locations = data.get_locations(session)
 	# get loop set

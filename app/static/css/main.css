@@ -46,6 +46,23 @@ h3 {
 				margin:0 auto;
 				text-align:center;
 				width:500px;
+}
+
+#session_box{
+	background-color: #FF9864;
+}
+
+#stage_box{
+	background-color:#B6FA64;
+}
+
+#interaction_box{
+	background-color: #BD3CFF;
+}
+
+.box{
+	padding:20px;
+}
 .section {
 				margin: 0 auto;
 				margin-top:20px;
@@ -53,4 +70,13 @@ h3 {
 				border-radius:25px;
 }
 
-
+.stage {
+	width:200px;
+	height:2em;
+}
+.stage p {
+	text-align:center;
+	vertical-align:middle;
+	height:100%;
+	width:100%;
+}

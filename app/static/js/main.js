@@ -77,7 +77,7 @@ function load_stages(){
   $stage_DOM_elements = [];
   stage_num = 0;
   if($('#choose_stage').length == 0){
-    $("stage_box").html('<h1>Choose a stage</h1>');
+    $("stage_box").append('<h1>Choose a stage</h1>');
   }
 
   for (s in stage_to_colors){
